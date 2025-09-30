@@ -19,7 +19,7 @@ export const Footer = () => {
                 asChild
               >
                 <a
-                  href="https://wa.me/your-number"
+                  href="https://wa.me/79774906005"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 justify-center"
@@ -35,7 +35,7 @@ export const Footer = () => {
                 asChild
               >
                 <a
-                  href="https://t.me/your-username"
+                  href="https://t.me/aromabro"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 justify-center"
@@ -51,7 +51,7 @@ export const Footer = () => {
                 asChild
               >
                 <a
-                  href="https://instagram.com/your-profile"
+                  href="https://instagram.com/parfu.mestore"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 justify-center"

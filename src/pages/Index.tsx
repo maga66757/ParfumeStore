@@ -1,78 +1,13 @@
 import { useState } from "react";
 import { Hero } from "@/components/Hero";
 import { BrandCard } from "@/components/BrandCard";
-import { BrandModal } from "@/components/BrandModal";
+import { Suspense, lazy } from "react";
+const BrandModal = lazy(() => import("@/components/BrandModal").then(m => ({ default: m.BrandModal })));
 import { ContactForm } from "@/components/ContactForm";
 import { Footer } from "@/components/Footer";
+import { trackEvent } from "@/lib/analytics";
+import { brands, extraBrands, Brand } from "@/data/brands";
 
-import brandDior from "@/assets/brand-dior.jpg";
-import brandChanel from "@/assets/brand-chanel.jpg";
-import brandMontale from "@/assets/brand-montale.jpg";
-import brandVersace from "@/assets/brand-versace.jpg";
-import brandTomFord from "@/assets/brand-tomford.jpg";
-
-const brands = [
-  {
-    name: "Dior",
-    image: brandDior,
-    perfumes: [
-      { name: "Dior Sauvage", price: "от 8 500 ₽" },
-      { name: "Miss Dior", price: "от 7 900 ₽" },
-      { name: "J'adore", price: "от 9 200 ₽" },
-      { name: "Fahrenheit", price: "от 7 500 ₽" },
-      { name: "Dior Homme", price: "от 8 100 ₽" },
-      { name: "Poison", price: "от 7 300 ₽" },
-    ],
-  },
-  {
-    name: "Chanel",
-    image: brandChanel,
-    perfumes: [
-      { name: "Chanel №5", price: "от 9 800 ₽" },
-      { name: "Coco Mademoiselle", price: "от 9 500 ₽" },
-      { name: "Bleu de Chanel", price: "от 8 900 ₽" },
-      { name: "Chance", price: "от 8 600 ₽" },
-      { name: "Allure", price: "от 8 400 ₽" },
-      { name: "Gabrielle", price: "от 9 100 ₽" },
-    ],
-  },
-  {
-    name: "Montale",
-    image: brandMontale,
-    perfumes: [
-      { name: "Wood & Spices", price: "от 8 500 ₽" },
-      { name: "Black Aoud", price: "от 9 200 ₽" },
-      { name: "Intense Cafe", price: "от 8 800 ₽" },
-      { name: "Red Aoud", price: "от 9 500 ₽" },
-      { name: "Chocolate Greedy", price: "от 8 200 ₽" },
-      { name: "Vanilla Cake", price: "от 7 900 ₽" },
-    ],
-  },
-  {
-    name: "Versace",
-    image: brandVersace,
-    perfumes: [
-      { name: "Eros", price: "от 6 800 ₽" },
-      { name: "Bright Crystal", price: "от 6 200 ₽" },
-      { name: "Dylan Blue", price: "от 6 500 ₽" },
-      { name: "Pour Homme", price: "от 5 900 ₽" },
-      { name: "Crystal Noir", price: "от 6 400 ₽" },
-      { name: "Eros Flame", price: "от 7 100 ₽" },
-    ],
-  },
-  {
-    name: "Tom Ford",
-    image: brandTomFord,
-    perfumes: [
-      { name: "Black Orchid", price: "от 12 500 ₽" },
-      { name: "Oud Wood", price: "от 15 200 ₽" },
-      { name: "Tobacco Vanille", price: "от 14 800 ₽" },
-      { name: "Noir", price: "от 11 900 ₽" },
-      { name: "Lost Cherry", price: "от 16 500 ₽" },
-      { name: "Velvet Orchid", price: "от 13 200 ₽" },
-    ],
-  },
-];
 
 const Index = () => {
   const [selectedBrand, setSelectedBrand] = useState<typeof brands[0] | null>(null);
@@ -85,11 +20,21 @@ const Index = () => {
   const handleBrandClick = (brand: typeof brands[0]) => {
     setSelectedBrand(brand);
     setShowModal(true);
+    trackEvent("brand_click", { brand: brand.name });
   };
 
-  const handleOrderFromModal = () => {
+  const handleOrderFromModal = (perfumeName?: string) => {
     setShowModal(false);
+    // заполнение выбранного аромата в форму
+    if (perfumeName) {
+      const input = document.getElementById("perfume") as HTMLInputElement | null;
+      if (input) {
+        input.value = perfumeName;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
     scrollToForm();
+    if (selectedBrand) trackEvent("order_from_modal", { brand: selectedBrand.name, perfume: perfumeName });
   };
 
   return (
@@ -117,22 +62,60 @@ const Index = () => {
               />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Assortment Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-card">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
-              Огромный ассортимент
-            </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed px-4">
-              Мы предлагаем более 50 000 ароматов. Хотите больше? Свяжитесь с нами!
-            </p>
+          {/* Extra Brands Row */}
+          <div className="mt-6 sm:mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 max-w-7xl mx-auto">
+            {extraBrands.map((brand) => (
+              <BrandCard
+                key={brand.name}
+                name={brand.name}
+                image={brand.image}
+                onClick={() => handleBrandClick(brand)}
+              />
+            ))}
           </div>
         </div>
       </section>
+
+      {/* Floating CTA (mobile) */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:hidden z-40">
+        <button
+          onClick={scrollToForm}
+          className="px-5 py-3 rounded-full gradient-gold text-primary-foreground shadow-gold text-sm font-semibold"
+        >
+          Оставить заявку
+        </button>
+      </div>
+
+      {/* Why Us Section */}
+      <section className="py-10 sm:py-14 md:py-16 bg-card">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Почему мы</h2>
+            <p className="text-muted-foreground">Коротко о главных преимуществах нашего сервиса</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-6xl mx-auto">
+            <div className="p-5 rounded-xl border border-border/50 bg-background shadow-sm text-center">
+              <p className="text-lg font-semibold">Только оригинал</p>
+              <p className="text-sm text-muted-foreground mt-1">Поставки из ЕС от проверенных партнёров</p>
+            </div>
+            <div className="p-5 rounded-xl border border-border/50 bg-background shadow-sm text-center">
+              <p className="text-lg font-semibold">50 000+ ароматов</p>
+              <p className="text-sm text-muted-foreground mt-1">Подберём альтернативу и редкие позиции</p>
+            </div>
+            <div className="p-5 rounded-xl border border-border/50 bg-background shadow-sm text-center">
+              <p className="text-lg font-semibold">Быстрая связь</p>
+              <p className="text-sm text-muted-foreground mt-1">WhatsApp и Telegram — отвечаем оперативно</p>
+            </div>
+            <div className="p-5 rounded-xl border border-border/50 bg-background shadow-sm text-center">
+              <p className="text-lg font-semibold">Удобная доставка</p>
+              <p className="text-sm text-muted-foreground mt-1">Отправим по всей России удобным способом</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Assortment Section removed by request */}
 
       {/* Contact Form Section */}
       <section id="contact-form" className="py-12 sm:py-16 md:py-20 bg-gradient-elegant">
@@ -153,13 +136,17 @@ const Index = () => {
 
       {/* Brand Modal */}
       {selectedBrand && (
-        <BrandModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          brandName={selectedBrand.name}
-          perfumes={selectedBrand.perfumes}
-          onOrder={handleOrderFromModal}
-        />
+        <Suspense fallback={null}>
+          <BrandModal
+            isOpen={showModal}
+            onClose={() => {
+              setShowModal(false);
+            }}
+            brandName={selectedBrand.name}
+            perfumes={selectedBrand.perfumes}
+            onOrder={handleOrderFromModal}
+          />
+        </Suspense>
       )}
     </div>
   );

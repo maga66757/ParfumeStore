@@ -13,9 +13,11 @@ export const BrandCard = ({ name, image, onClick }: BrandCardProps) => {
       className="group cursor-pointer overflow-hidden shadow-elegant hover:shadow-gold transition-smooth bg-card border-border/50"
     >
       <div className="aspect-square relative overflow-hidden">
-        <img 
-          src={image} 
+        <img
+          src={image}
           alt={name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-110 transition-smooth"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-smooth" />

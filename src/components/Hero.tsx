@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-perfumes.jpg";
+import logo from "@/../image/logo.png";
 
 interface HeroProps {
   onOrderClick: () => void;
@@ -20,8 +21,16 @@ export const Hero = ({ onOrderClick, onContactClick }: HeroProps) => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto space-y-8">
-          {/* Logo */}
-          <div className="space-y-2">
+          {/* Logo + Brand */}
+          <div className="space-y-4">
+            <img
+              src={logo}
+              alt="Parfumestore logo"
+              loading="eager"
+              decoding="async"
+              className="mx-auto w-40 sm:w-48 md:w-56 lg:w-64 h-auto drop-shadow-lg select-none"
+              style={{ filter: "drop-shadow(0 6px 20px rgba(0,0,0,.25))" }}
+            />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-foreground via-accent to-foreground bg-clip-text text-transparent">
               Parfumestore
             </h1>
@@ -59,12 +68,7 @@ export const Hero = ({ onOrderClick, onContactClick }: HeroProps) => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-accent/50 rounded-full flex items-start justify-center p-2">
-          <div className="w-1.5 h-3 bg-accent rounded-full" />
-        </div>
-      </div>
+      {/* Scroll Indicator removed by request */}
     </section>
   );
 };

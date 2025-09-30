@@ -14,12 +14,19 @@ export const ContactForm = () => {
     perfume: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // honeypot (anti-bot)
+    if (honeypot) {
+      return;
+    }
+
     if (!formData.name || !formData.phone) {
       toast.error("Заполните обязательные поля");
       return;
@@ -30,12 +37,14 @@ export const ContactForm = () => {
       return;
     }
 
+    setIsSending(true);
     setSubmitted(true);
     toast.success("Спасибо, скоро с вами свяжутся!");
     
     setTimeout(() => {
       setFormData({ name: "", phone: "", perfume: "" });
       setSubmitted(false);
+      setIsSending(false);
       setPrivacyAccepted(false);
     }, 3000);
   };
@@ -73,6 +82,17 @@ export const ContactForm = () => {
   return (
     <Card className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 shadow-elegant">
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        {/* Honeypot field (hidden for users) */}
+        <input
+          type="text"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          className="hidden"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
+
         <div className="space-y-2">
           <Label htmlFor="name">ФИО *</Label>
           <Input
@@ -87,15 +107,65 @@ export const ContactForm = () => {
 
         <div className="space-y-2">
           <Label htmlFor="phone">Телефон *</Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          <div className="flex items-center gap-2">
+            <Input
+              id="phone"
+              type="tel"
+              value={formData.phone}
+              onKeyDown={(e) => {
+                if (e.key === "Backspace" || e.key === "Delete") {
+                  e.preventDefault();
+                }
+              }}
+              onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "");
+              if (digits.length === 0) {
+                setFormData({ ...formData, phone: "" });
+                return;
+              }
+
+              // Нормализация под российский формат: допускаем ввод, начинающийся с 8 или 9
+              let d = digits;
+              if (d[0] === "8") d = "7" + d.slice(1);
+              if (d[0] === "9") d = "7" + d; // если ввели с 9, считаем как +7 9..
+
+              // Берём только первые 11 цифр (7 + 10)
+              d = d.slice(0, 11);
+
+              if (d[0] !== "7") {
+                // если другая страна — не форматируем по маске
+                setFormData({ ...formData, phone: e.target.value });
+                return;
+              }
+
+              const a = d.slice(1, 4);
+              const b = d.slice(4, 7);
+              const c = d.slice(7, 9);
+              const f = d.slice(9, 11);
+
+              let out = "+7";
+              if (a) out += ` (${a}` + (a.length === 3 ? ")" : "");
+              if (b) out += a.length === 3 ? ` ${b}` : "";
+              if (c) out += `-${c}`;
+              if (f) out += `-${f}`;
+
+              setFormData({ ...formData, phone: out });
+            }}
             placeholder="+7 (___) ___-__-__"
             required
-            className="border-border/50 focus:border-accent"
+            className="border-border/50 focus:border-accent flex-1"
           />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setFormData({ ...formData, phone: "" })}
+              disabled={!formData.phone}
+              className="shrink-0"
+              aria-label="Очистить номер"
+            >
+              ×
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -133,9 +203,10 @@ export const ContactForm = () => {
 
         <Button 
           type="submit"
-          className="w-full gradient-gold hover:opacity-90 text-base sm:text-lg py-5 sm:py-6 shadow-gold transition-smooth"
+          disabled={isSending}
+          className="w-full gradient-gold hover:opacity-90 text-base sm:text-lg py-5 sm:py-6 shadow-gold transition-smooth disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Отправить заявку
+          {isSending ? "Отправка..." : "Отправить заявку"}
         </Button>
       </form>
 

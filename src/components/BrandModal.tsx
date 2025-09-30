@@ -17,7 +17,7 @@ interface BrandModalProps {
   onClose: () => void;
   brandName: string;
   perfumes: Perfume[];
-  onOrder: () => void;
+  onOrder: (perfumeName: string) => void;
 }
 
 export const BrandModal = ({ isOpen, onClose, brandName, perfumes, onOrder }: BrandModalProps) => {
@@ -32,13 +32,12 @@ export const BrandModal = ({ isOpen, onClose, brandName, perfumes, onOrder }: Br
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4 sm:mt-6">
           {perfumes.map((perfume, index) => (
             <Card key={index} className="p-3 sm:p-4 hover:shadow-gold transition-smooth">
-              <h4 className="font-semibold text-foreground mb-2 text-sm sm:text-base">{perfume.name}</h4>
-              <p className="text-accent font-bold text-base sm:text-lg mb-2 sm:mb-3">{perfume.price}</p>
-              <Button 
-                onClick={onOrder}
+              <h4 className="font-semibold text-foreground mb-3 text-sm sm:text-base">{perfume.name}</h4>
+              <Button
+                onClick={() => onOrder(perfume.name)}
                 className="w-full gradient-gold hover:opacity-90 transition-smooth text-sm sm:text-base py-2"
               >
-                Заказать
+                Узнать цену
               </Button>
             </Card>
           ))}
