@@ -3,6 +3,11 @@ import brandChanel from "@/../image/chanel.png";
 import brandMontale from "@/../image/Montale.png";
 import brandVersace from "@/../image/versace.png";
 import brandTomFord from "@/../image/tomford.png";
+import brandAmouage from "@/../image/amouage.png";
+import brandParfumsDeMarly from "@/../image/Parfums de Marly.png";
+import brandCreed from "@/../image/creed.png";
+import brandExNihilo from "@/../image/ExNihilo.png";
+import brandByredo from "@/../image/byredo.png";
 
 export const brands = [
   {
@@ -70,7 +75,7 @@ export const brands = [
 export type Brand = typeof brands[number];
 
 export const extraBrands: Brand[] = [
-  { name: "Amouage", image: "/image/amouage.png", perfumes: [
+  { name: "Amouage", image: brandAmouage, perfumes: [
     { name: "Interlude Man", price: "" },
     { name: "Reflection Man", price: "" },
     { name: "Memoir Woman", price: "" },
@@ -78,7 +83,7 @@ export const extraBrands: Brand[] = [
     { name: "Jubilation XXV", price: "" },
     { name: "Sunshine Man", price: "" },
   ]},
-  { name: "Parfums de Marly", image: "/image/Parfums de Marly.png", perfumes: [
+  { name: "Parfums de Marly", image: brandParfumsDeMarly, perfumes: [
     { name: "Layton", price: "" },
     { name: "Herod", price: "" },
     { name: "Pegasus", price: "" },
@@ -86,7 +91,7 @@ export const extraBrands: Brand[] = [
     { name: "Delina", price: "" },
     { name: "Percival", price: "" },
   ]},
-  { name: "Creed", image: "/image/creed.png", perfumes: [
+  { name: "Creed", image: brandCreed, perfumes: [
     { name: "Aventus", price: "" },
     { name: "Green Irish Tweed", price: "" },
     { name: "Silver Mountain Water", price: "" },
@@ -94,7 +99,7 @@ export const extraBrands: Brand[] = [
     { name: "Himalaya", price: "" },
     { name: "Viking", price: "" },
   ]},
-  { name: "Ex Nihilo", image: "/image/ExNihilo.png", perfumes: [
+  { name: "Ex Nihilo", image: brandExNihilo, perfumes: [
     { name: "Fleur Narcotique", price: "" },
     { name: "Oud Vendome", price: "" },
     { name: "Citizen X", price: "" },
@@ -102,7 +107,7 @@ export const extraBrands: Brand[] = [
     { name: "Venenum Kiss", price: "" },
     { name: "Honoré Delights", price: "" },
   ]},
-  { name: "Byredo", image: "/image/byredo.png", perfumes: [
+  { name: "Byredo", image: brandByredo, perfumes: [
     { name: "Gypsy Water", price: "" },
     { name: "Bal d'Afrique", price: "" },
     { name: "Mojave Ghost", price: "" },
