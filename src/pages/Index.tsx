@@ -61,10 +61,6 @@ const Index = () => {
                 onClick={() => handleBrandClick(brand)}
               />
             ))}
-          </div>
-
-          {/* Extra Brands Row */}
-          <div className="mt-6 sm:mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 max-w-7xl mx-auto">
             {extraBrands.map((brand) => (
               <BrandCard
                 key={brand.name}
