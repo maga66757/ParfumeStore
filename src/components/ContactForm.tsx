@@ -19,7 +19,7 @@ export const ContactForm = () => {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [honeypot, setHoneypot] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // honeypot (anti-bot)
@@ -37,16 +37,32 @@ export const ContactForm = () => {
       return;
     }
 
-    setIsSending(true);
-    setSubmitted(true);
-    toast.success("Спасибо, скоро с вами свяжутся!");
-    
-    setTimeout(() => {
+    try {
+      setIsSending(true);
+      const resp = await fetch("/api/send-telegram", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          perfume: formData.perfume || undefined,
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err?.error || "Не удалось отправить заявку");
+      }
+
+      setSubmitted(true);
+      toast.success("Спасибо, заявка отправлена в Telegram!");
       setFormData({ name: "", phone: "", perfume: "" });
-      setSubmitted(false);
-      setIsSending(false);
       setPrivacyAccepted(false);
-    }, 3000);
+    } catch (err: any) {
+      toast.error(err?.message || "Ошибка отправки. Попробуйте позже");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   if (submitted) {
